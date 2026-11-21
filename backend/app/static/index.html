@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PriceIntel | Competitor Price Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen flex bg-slate-50 text-slate-900">
+
+  <!-- Sidebar -->
+  <aside class="w-64 border-r border-slate-200 bg-white flex flex-col justify-between h-screen sticky top-0 flex-shrink-0 z-20 shadow-sm">
+    <div>
+      <!-- Brand -->
+      <div class="h-16 flex items-center px-6 border-b border-slate-200 gap-3 bg-white">
+        <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+          <i class="fa-solid fa-chart-line text-sm"></i>
+        </div>
+        <div>
+          <h1 class="text-sm font-bold text-slate-900 tracking-tight leading-tight">PriceIntel</h1>
+          <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Competitor Radar</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="p-4 space-y-1">
+        <button onclick="switchTab('overview')" id="nav-overview" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-sky-50 text-sky-600 border border-sky-100">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-table-columns w-4"></i>
+            <span>Overview</span>
+          </div>
+        </button>
+
+        <button onclick="switchTab('products')" id="nav-products" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-magnifying-glass w-4"></i>
+            <span>Product Explorer</span>
+          </div>
+        </button>
+
+        <button onclick="switchTab('competitors')" id="nav-competitors" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-scale-balanced w-4"></i>
+            <span>Competitor Intel</span>
+          </div>
+        </button>
+
+        <button onclick="switchTab('alerts')" id="nav-alerts" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-bell w-4"></i>
+            <span>Price Alerts</span>
+          </div>
+          <span id="alerts-badge" class="px-2 py-0.5 text-xs font-semibold rounded-full bg-rose-50 text-rose-600 border border-rose-200">0</span>
+        </button>
+
+        <button onclick="switchTab('jobs')" id="nav-jobs" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-rotate w-4"></i>
+            <span>Collection Jobs</span>
+          </div>
+        </button>
+
+        <button onclick="switchTab('settings')" id="nav-settings" class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-sliders w-4"></i>
+            <span>Settings & Export</span>
+          </div>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Live Status Pill -->
+    <div class="p-4 border-t border-slate-200 bg-slate-50/50">
+      <div class="rounded-xl bg-white p-3 border border-slate-200 shadow-sm">
+        <div class="flex items-center gap-2">
+          <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-semibold text-slate-800">Live Surveillance Active</span>
+        </div>
+        <p class="mt-1 text-[11px] text-slate-500">FastAPI backend & PostgreSQL connected</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 overflow-y-auto min-h-screen p-8 max-w-7xl mx-auto space-y-8">
+
+    <!-- TAB 1: OVERVIEW -->
+    <div id="tab-overview" class="space-y-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-900">Market Intelligence Radar</h2>
+          <p className="text-sm text-slate-500 mt-1">Cross-retailer price movements, trends, and real-time competitor undercutting</p>
+        </div>
+        <button onclick="switchTab('competitors')" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm flex items-center gap-2 transition-all shadow-md shadow-sky-600/20">
+          <span>Compare Competitors</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+        </button>
+      </div>
+
+      <!-- KPI Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="kpi-grid">
+        <div class="h-28 rounded-2xl border border-slate-200 bg-white animate-pulse"></div>
+        <div class="h-28 rounded-2xl border border-slate-200 bg-white animate-pulse"></div>
+        <div class="h-28 rounded-2xl border border-slate-200 bg-white animate-pulse"></div>
+        <div class="h-28 rounded-2xl border border-slate-200 bg-white animate-pulse"></div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-base font-semibold text-slate-900">30-Day Market Price Trend</h3>
+              <p class="text-xs text-slate-500">Average daily market observed prices (USD)</p>
+            </div>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-sky-600 border border-slate-200">Trend</span>
+          </div>
+          <div class="h-72">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-base font-semibold text-slate-900">Catalog by Category</h3>
+              <p class="text-xs text-slate-500">Total products monitored per merchandise category</p>
+            </div>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-emerald-600 border border-slate-200">Categories</span>
+          </div>
+          <div class="h-72">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Retailers & Recent Activity -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h3 class="text-base font-semibold text-slate-900 mb-1">Monitored Retailers</h3>
+          <p class="text-xs text-slate-500 mb-4">Active competitor coverage</p>
+          <div id="retailers-list" class="space-y-3"></div>
+        </div>
+
+        <div class="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-base font-semibold text-slate-900">Recent Price Intelligence Alerts</h3>
+              <p class="text-xs text-slate-500">Live competitor price cuts, discounts, and inventory changes</p>
+            </div>
+            <button onclick="switchTab('alerts')" class="text-xs font-semibold text-sky-600 hover:text-sky-700">View all &rarr;</button>
+          </div>
+          <div id="recent-alerts-list" class="space-y-2.5"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: PRODUCT EXPLORER -->
+    <div id="tab-products" class="space-y-6 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-900">Product Explorer</h2>
+          <p class="text-sm text-slate-500 mt-1">Cross-store catalog matching, pricing disparities, and stock status</p>
+        </div>
+        <span id="product-total-count" class="text-xs font-semibold text-sky-600 bg-sky-50 px-3 py-1 rounded-full border border-sky-100">Loading catalog...</span>
+      </div>
+
+      <!-- Search & Filter Bar -->
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div class="relative w-full md:w-80">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+          <input type="text" id="product-search" placeholder="Search products, brands, models..." oninput="onProductSearch(this.value)" class="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+        </div>
+
+        <div class="flex items-center gap-3 w-full md:w-auto">
+          <select id="product-category-filter" onchange="onCategoryFilter(this.value)" class="py-2 px-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 focus:outline-none focus:bg-white focus:border-sky-500">
+            <option value="">All Categories</option>
+            <option value="Laptops">Laptops</option>
+            <option value="Smartphones">Smartphones</option>
+            <option value="Audio">Audio</option>
+            <option value="Wearables">Wearables</option>
+            <option value="Home Office">Home Office</option>
+            <option value="Accessories">Accessories</option>
+          </select>
+
+          <select id="product-stock-filter" onchange="onStockFilter(this.value)" class="py-2 px-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-700 focus:outline-none focus:bg-white focus:border-sky-500">
+            <option value="">All Inventory</option>
+            <option value="in_stock">In Stock Only</option>
+            <option value="out_of_stock">Out of Stock</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Product Table -->
+      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider font-semibold">
+              <tr>
+                <th class="px-6 py-4">Product</th>
+                <th class="px-6 py-4">Brand</th>
+                <th class="px-6 py-4">Category</th>
+                <th class="px-6 py-4">Price Range</th>
+                <th class="px-6 py-4">Retailers</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4 text-right">Offers</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+        <div id="products-pagination" class="px-6 py-4 border-t border-slate-200 bg-slate-50/50 flex items-center justify-between text-xs text-slate-500"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: COMPETITOR INTEL -->
+    <div id="tab-competitors" class="space-y-6 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-900">Competitor Price Intelligence</h2>
+          <p class="text-sm text-slate-500 mt-1">Direct head-to-head pricing benchmark against market competitors</p>
+        </div>
+        <div class="flex items-center gap-3 bg-white border border-slate-200 p-2 rounded-2xl shadow-sm">
+          <span class="text-xs font-semibold text-slate-500 pl-2">Reference Store:</span>
+          <select id="comp-ref-retailer" onchange="loadCompetitorData(this.value)" class="bg-slate-50 border border-slate-200 text-sky-600 font-semibold text-sm rounded-xl px-3 py-1.5 focus:outline-none">
+            <option value="1">MarketHub (US)</option>
+            <option value="2">ValueCart (US)</option>
+            <option value="3">PrimeSelect (US)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Competitor Summary KPIs -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="comp-kpi-grid"></div>
+
+      <!-- Competitor Table -->
+      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider font-semibold">
+              <tr>
+                <th class="px-6 py-4">Product</th>
+                <th class="px-6 py-4">Your Price</th>
+                <th class="px-6 py-4">Competitor</th>
+                <th class="px-6 py-4">Competitor Price</th>
+                <th class="px-6 py-4">Difference ($)</th>
+                <th class="px-6 py-4">Disparity (%)</th>
+                <th class="px-6 py-4 text-right">Verdict</th>
+              </tr>
+            </thead>
+            <tbody id="competitors-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ALERTS -->
+    <div id="tab-alerts" class="space-y-6 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-900">Pricing & Stock Alerts</h2>
+          <p class="text-sm text-slate-500 mt-1">Real-time triggers generated from automated collection and threshold monitoring</p>
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider font-semibold">
+              <tr>
+                <th class="px-6 py-4">Trigger Type</th>
+                <th class="px-6 py-4">Product</th>
+                <th class="px-6 py-4">Retailer</th>
+                <th class="px-6 py-4">Event Details</th>
+                <th class="px-6 py-4">Timestamp</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="alerts-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: JOBS -->
+    <div id="tab-jobs" class="space-y-6 hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight text-slate-900">Collection Pipeline Jobs</h2>
+          <p class="text-sm text-slate-500 mt-1">Audit trail of automated data harvesting runs, record volumes, and status</p>
+        </div>
+        <button onclick="triggerPipelineRun()" id="trigger-btn" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-semibold text-sm flex items-center gap-2 transition-all shadow-md shadow-sky-600/20">
+          <i class="fa-solid fa-play"></i>
+          <span>Run Pipeline Now</span>
+        </button>
+      </div>
+
+      <div class="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider font-semibold">
+              <tr>
+                <th class="px-6 py-4">Run ID</th>
+                <th class="px-6 py-4">Data Source</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4">Extracted</th>
+                <th class="px-6 py-4">Loaded</th>
+                <th class="px-6 py-4">Duration</th>
+                <th class="px-6 py-4 text-right">Started At</th>
+              </tr>
+            </thead>
+            <tbody id="jobs-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: SETTINGS & EXPORT -->
+    <div id="tab-settings" class="space-y-8 hidden">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900">System Configuration & Data Export</h2>
+        <p class="text-sm text-slate-500 mt-1">Configure automated alert thresholds, scheduler intervals, and export clean datasets</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+            <h3 class="text-base font-semibold text-slate-900 border-b border-slate-200 pb-3">Alert Thresholds</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label class="text-xs font-semibold text-slate-700">Price Drop Threshold (%)</label>
+                <input type="number" id="setting-drop" value="5.0" step="0.5" class="mt-2 w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:bg-white focus:border-sky-500">
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-slate-700">Price Increase Threshold (%)</label>
+                <input type="number" id="setting-increase" value="5.0" step="0.5" class="mt-2 w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:outline-none focus:bg-white focus:border-sky-500">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+            <h3 class="text-base font-semibold text-slate-900 border-b border-slate-200 pb-3">Analytical Data Export</h3>
+            <p class="text-xs text-slate-500">Download reconciled cross-retailer catalogs with current prices and inventory status.</p>
+            <div class="space-y-3 pt-2">
+              <a href="/api/v1/reports/export?file_format=csv" class="w-full p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-between text-left transition-colors block">
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-file-csv text-sky-600 text-lg"></i>
+                  <div>
+                    <h4 class="text-xs font-bold text-slate-800">Export CSV Report</h4>
+                    <p class="text-[11px] text-slate-500">Universal comma-separated spreadsheet</p>
+                  </div>
+                </div>
+                <i class="fa-solid fa-download text-slate-400 text-xs"></i>
+              </a>
+
+              <a href="/api/v1/reports/export?file_format=xlsx" class="w-full p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 flex items-center justify-between text-left transition-colors block">
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i>
+                  <div>
+                    <h4 class="text-xs font-bold text-slate-800">Export Microsoft Excel (.xlsx)</h4>
+                    <p class="text-[11px] text-slate-500">Multi-column formatted workbook</p>
+                  </div>
+                </div>
+                <i class="fa-solid fa-download text-slate-400 text-xs"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let trendChartInstance = null;
+    let categoryChartInstance = null;
+    let currentProductPage = 0;
+    let searchDebounce = null;
+
+    function switchTab(tabId) {
+      document.querySelectorAll('main > div').forEach(el => el.classList.add('hidden'));
+      document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+      document.querySelectorAll('nav button').forEach(btn => {
+        btn.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100";
+      });
+      const activeBtn = document.getElementById('nav-' + tabId);
+      if (activeBtn) {
+        activeBtn.className = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-colors bg-sky-50 text-sky-600 border border-sky-100";
+      }
+
+      if (tabId === 'products') loadProducts();
+      if (tabId === 'competitors') loadCompetitorData(document.getElementById('comp-ref-retailer').value);
+      if (tabId === 'alerts') loadAlerts();
+      if (tabId === 'jobs') loadJobs();
+    }
+
+    async function loadOverview() {
+      try {
+        const res = await fetch('/api/v1/dashboard/summary');
+        const data = await res.json();
+
+        // Populate KPIs
+        const kpiGrid = document.getElementById('kpi-grid');
+        kpiGrid.innerHTML = `
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-500">Monitored Products</span>
+              <div class="rounded-xl bg-sky-50 p-2 text-sky-600 border border-sky-100"><i class="fa-solid fa-box text-sm"></i></div>
+            </div>
+            <div class="text-2xl font-bold text-slate-900">${data.monitored_products.toLocaleString()}</div>
+            <div class="text-[11px] text-slate-400 mt-1">Catalog items tracked</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-500">Active Retailers</span>
+              <div class="rounded-xl bg-emerald-50 p-2 text-emerald-600 border border-emerald-100"><i class="fa-solid fa-cart-shopping text-sm"></i></div>
+            </div>
+            <div class="text-2xl font-bold text-slate-900">${data.active_retailers}</div>
+            <div class="text-[11px] text-slate-400 mt-1">${data.active_offers} active offers</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-500">Average Catalog Price</span>
+              <div class="rounded-xl bg-indigo-50 p-2 text-indigo-600 border border-indigo-100"><i class="fa-solid fa-dollar-sign text-sm"></i></div>
+            </div>
+            <div class="text-2xl font-bold text-slate-900">$${data.average_product_price.toFixed(2)}</div>
+            <div class="text-[11px] text-slate-400 mt-1">Across all categories</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-500">Active Price Alerts</span>
+              <div class="rounded-xl bg-rose-50 p-2 text-rose-600 border border-rose-100"><i class="fa-solid fa-bell text-sm"></i></div>
+            </div>
+            <div class="text-2xl font-bold text-rose-600">${data.active_alerts}</div>
+            <div class="text-[11px] text-rose-500 mt-1">${data.recent_price_drops} price drops</div>
+          </div>
+        `;
+
+        document.getElementById('alerts-badge').innerText = data.active_alerts;
+
+        // Retailers
+        const retContainer = document.getElementById('retailers-list');
+        retContainer.innerHTML = data.retailer_summary.map(r => `
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+            <div>
+              <h4 class="text-sm font-semibold text-slate-800">${r.retailer}</h4>
+              <p class="text-xs text-slate-500">${r.offer_count} offers tracked</p>
+            </div>
+            <div class="text-right">
+              <span class="text-sm font-bold text-sky-600">$${r.avg_price.toFixed(2)}</span>
+              <p class="text-[10px] text-slate-400">avg offer</p>
+            </div>
+          </div>
+        `).join('');
+
+        // Price Trends Chart (Light Mode)
+        if (trendChartInstance) trendChartInstance.destroy();
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        trendChartInstance = new Chart(trendCtx, {
+          type: 'line',
+          data: {
+            labels: data.price_trends.map(t => t.date.slice(5)),
+            datasets: [{
+              label: 'Avg Price ($)',
+              data: data.price_trends.map(t => t.avg_price),
+              borderColor: '#0284c7',
+              backgroundColor: 'rgba(2, 132, 199, 0.08)',
+              fill: true,
+              tension: 0.3,
+              borderWidth: 2.5,
+              pointBackgroundColor: '#0284c7',
+              pointRadius: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#ffffff',
+                titleColor: '#0f172a',
+                bodyColor: '#334155',
+                borderColor: '#e2e8f0',
+                borderWidth: 1,
+                padding: 10,
+                boxPadding: 4
+              }
+            },
+            scales: {
+              x: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', font: { size: 10 } } },
+              y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', callback: v => '$' + v } }
+            }
+          }
+        });
+
+        // Category Chart (Light Mode)
+        if (categoryChartInstance) categoryChartInstance.destroy();
+        const catCtx = document.getElementById('categoryChart').getContext('2d');
+        categoryChartInstance = new Chart(catCtx, {
+          type: 'bar',
+          data: {
+            labels: data.category_distribution.map(c => c.category),
+            datasets: [{
+              label: 'Products',
+              data: data.category_distribution.map(c => c.product_count),
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#ffffff',
+                titleColor: '#0f172a',
+                bodyColor: '#334155',
+                borderColor: '#e2e8f0',
+                borderWidth: 1,
+                padding: 10
+              }
+            },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+              y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b' } }
+            }
+          }
+        });
+
+        // Recent alerts
+        const alertsRes = await fetch('/api/v1/alerts?limit=5');
+        const alertsData = await alertsRes.json();
+        const recentAlertsEl = document.getElementById('recent-alerts-list');
+        if (alertsData.items && alertsData.items.length) {
+          recentAlertsEl.innerHTML = alertsData.items.map(a => `
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-4">
+              <div class="space-y-0.5">
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-semibold text-slate-800">${a.product_name}</span>
+                  <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-50 text-rose-600 border border-rose-200 capitalize">${a.alert_type.replace(/_/g, ' ')}</span>
+                </div>
+                <p class="text-xs text-slate-500">${a.message}</p>
+              </div>
+              <span class="text-xs text-slate-400 whitespace-nowrap">${a.created_at ? new Date(a.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>
+            </div>
+          `).join('');
+        } else {
+          recentAlertsEl.innerHTML = '<p class="text-xs text-slate-400 py-4 text-center">No active alerts recorded.</p>';
+        }
+
+      } catch (err) {
+        console.error('Error loading dashboard:', err);
+      }
+    }
+
+    async function loadProducts(page = 0) {
+      currentProductPage = page;
+      const q = document.getElementById('product-search').value;
+      const cat = document.getElementById('product-category-filter').value;
+      const stock = document.getElementById('product-stock-filter').value;
+
+      const params = new URLSearchParams({ limit: 15, offset: page * 15 });
+      if (q) params.set('q', q);
+      if (cat) params.set('category', cat);
+      if (stock) params.set('stock', stock);
+
+      const res = await fetch('/api/v1/products?' + params.toString());
+      const data = await res.json();
+
+      document.getElementById('product-total-count').innerText = `${data.total} Total Products`;
+
+      const tbody = document.getElementById('products-tbody');
+      tbody.innerHTML = data.items.map(p => `
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-4">
+            <div class="font-semibold text-slate-900">${p.canonical_name}</div>
+            <div class="text-xs text-slate-400 font-mono">${p.model_number || p.gtin || 'SKU-001'}</div>
+          </td>
+          <td class="px-6 py-4 text-slate-600 font-medium">${p.brand}</td>
+          <td class="px-6 py-4">
+            <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 font-medium">${p.category}</span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="font-bold text-sky-600">$${p.min_price.toFixed(2)}</span>
+            ${p.max_price > p.min_price ? `<span class="text-xs text-slate-400"> - $${p.max_price.toFixed(2)}</span>` : ''}
+          </td>
+          <td class="px-6 py-4 text-slate-600 font-medium">${p.offer_count} offers</td>
+          <td class="px-6 py-4">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border ${p.stock_status === 'in_stock' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'} capitalize">${p.stock_status.replace(/_/g, ' ')}</span>
+          </td>
+          <td class="px-6 py-4 text-right">
+            <button onclick="inspectProduct(${p.id})" class="px-3 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-600 border border-sky-200 text-xs font-semibold transition-colors">Inspect</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Pagination
+      const pagination = document.getElementById('products-pagination');
+      const totalPages = Math.ceil(data.total / 15);
+      pagination.innerHTML = `
+        <span>Showing ${page * 15 + 1} - ${Math.min((page + 1) * 15, data.total)} of ${data.total}</span>
+        <div class="flex items-center gap-2">
+          <button ${page === 0 ? 'disabled' : ''} onclick="loadProducts(${page - 1})" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40">&larr; Prev</button>
+          <span class="font-medium text-slate-700">Page ${page + 1} of ${totalPages || 1}</span>
+          <button ${(page + 1) * 15 >= data.total ? 'disabled' : ''} onclick="loadProducts(${page + 1})" class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40">Next &rarr;</button>
+        </div>
+      `;
+    }
+
+    function onProductSearch(val) {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => loadProducts(0), 300);
+    }
+    function onCategoryFilter(val) { loadProducts(0); }
+    function onStockFilter(val) { loadProducts(0); }
+
+    async function inspectProduct(id) {
+      const res = await fetch('/api/v1/products/' + id);
+      const p = await res.json();
+      alert(`Product: ${p.canonical_name}\nCategory: ${p.category} | Brand: ${p.brand}\nLowest Market Price: $${p.lowest_price} at ${p.cheapest_retailer || 'Retailer'}\nTotal Offers: ${p.offers.length}`);
+    }
+
+    async function loadCompetitorData(retailerId) {
+      const res = await fetch('/api/v1/competitors/comparison?reference_retailer=' + retailerId);
+      const data = await res.json();
+
+      const kpiEl = document.getElementById('comp-kpi-grid');
+      kpiEl.innerHTML = `
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="text-xs font-semibold text-slate-500 mb-1">Head-to-Head Comparisons</div>
+          <div class="text-2xl font-bold text-slate-900">${data.summary.total_comparisons}</div>
+          <div class="text-[11px] text-slate-400 mt-1">Matched catalog offers</div>
+        </div>
+        <div class="rounded-2xl border border-rose-200 bg-rose-50/60 p-5 shadow-sm">
+          <div class="text-xs font-semibold text-rose-600 mb-1">Competitor Undercutting</div>
+          <div class="text-2xl font-bold text-rose-600">${data.summary.competitor_cheaper_count}</div>
+          <div class="text-[11px] text-rose-500 mt-1">Competitors lower than you</div>
+        </div>
+        <div class="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 shadow-sm">
+          <div class="text-xs font-semibold text-emerald-600 mb-1">You Have Lowest Price</div>
+          <div class="text-2xl font-bold text-emerald-600">${data.summary.reference_cheaper_count}</div>
+          <div class="text-[11px] text-emerald-500 mt-1">Winning price advantage</div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="text-xs font-semibold text-slate-500 mb-1">Price Parity</div>
+          <div class="text-2xl font-bold text-slate-700">${data.summary.same_price_count}</div>
+          <div class="text-[11px] text-slate-400 mt-1">Identical offerings</div>
+        </div>
+      `;
+
+      const tbody = document.getElementById('competitors-tbody');
+      tbody.innerHTML = data.items.map(row => `
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-4 font-semibold text-slate-900">${row.product_name}</td>
+          <td class="px-6 py-4 font-bold text-slate-700">$${row.reference_price.toFixed(2)}</td>
+          <td class="px-6 py-4 text-slate-600 font-medium">${row.competitor_retailer}</td>
+          <td class="px-6 py-4 font-bold text-slate-700">$${row.competitor_price.toFixed(2)}</td>
+          <td class="px-6 py-4 font-mono font-medium">${row.cheaper_competitor ? '-' : '+'}$${row.absolute_difference.toFixed(2)}</td>
+          <td class="px-6 py-4 font-bold font-mono ${row.cheaper_competitor ? 'text-rose-600' : 'text-emerald-600'}">${row.percentage_difference > 0 ? '+' : ''}${row.percentage_difference.toFixed(1)}%</td>
+          <td class="px-6 py-4 text-right">
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${row.cheaper_competitor ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}">
+              ${row.cheaper_competitor ? 'Undercutting' : 'You are cheaper'}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadAlerts() {
+      const res = await fetch('/api/v1/alerts');
+      const data = await res.json();
+      const tbody = document.getElementById('alerts-tbody');
+      tbody.innerHTML = data.items.map(a => `
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-4">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-rose-50 text-rose-700 border-rose-200 capitalize">${a.alert_type.replace(/_/g, ' ')}</span>
+          </td>
+          <td class="px-6 py-4 font-semibold text-slate-900">${a.product_name}</td>
+          <td class="px-6 py-4 text-slate-600 font-medium">${a.retailer_name || 'Market comparison'}</td>
+          <td class="px-6 py-4 text-slate-600 text-xs">${a.message}</td>
+          <td class="px-6 py-4 text-xs text-slate-400">${new Date(a.created_at).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
+          <td class="px-6 py-4">
+            <span class="px-2 py-0.5 rounded text-xs font-semibold ${a.status === 'active' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'}">${a.status}</span>
+          </td>
+          <td class="px-6 py-4 text-right">
+            ${a.status === 'active' ? `<button onclick="acknowledgeAlert(${a.id})" class="px-3 py-1 rounded-lg bg-white hover:bg-slate-50 text-sky-600 text-xs font-semibold border border-slate-200 shadow-sm transition-colors">Acknowledge</button>` : '<span class="text-xs text-slate-400 font-medium">Acknowledged</span>'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function acknowledgeAlert(id) {
+      await fetch('/api/v1/alerts/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'acknowledged' })
+      });
+      loadAlerts();
+      loadOverview();
+    }
+
+    async function loadJobs() {
+      const res = await fetch('/api/v1/jobs');
+      const data = await res.json();
+      const tbody = document.getElementById('jobs-tbody');
+      tbody.innerHTML = data.items.map(j => `
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-4 font-mono text-xs font-bold text-slate-600">#${j.id}</td>
+          <td class="px-6 py-4 font-semibold text-slate-800">${j.source_name}</td>
+          <td class="px-6 py-4">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border ${j.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'} capitalize">${j.status}</span>
+          </td>
+          <td class="px-6 py-4 font-semibold text-slate-700">${j.records_extracted.toLocaleString()}</td>
+          <td class="px-6 py-4 font-semibold text-emerald-600">${j.records_loaded.toLocaleString()}</td>
+          <td class="px-6 py-4 text-xs font-mono text-slate-500">${j.duration_seconds !== null ? j.duration_seconds + 's' : 'N/A'}</td>
+          <td class="px-6 py-4 text-xs text-slate-400 text-right">${j.started_at ? new Date(j.started_at).toLocaleTimeString() : 'N/A'}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function triggerPipelineRun() {
+      const btn = document.getElementById('trigger-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Harvesting...</span>';
+      try {
+        await fetch('/api/v1/jobs/trigger', { method: 'POST' });
+        await loadJobs();
+        await loadOverview();
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-play"></i><span>Run Pipeline Now</span>';
+      }
+    }
+
+    // Initialize on load
+    loadOverview();
+  </script>
+</body>
+</html>

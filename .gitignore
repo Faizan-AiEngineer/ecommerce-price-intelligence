@@ -1,0 +1,72 @@
+# Python environments, caches and build output
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+.coverage
+.coverage.*
+.pytest_tmp/
+htmlcov/
+coverage/
+
+# Node dependencies and generated files
+node_modules/
+.vite/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local settings and credentials
+.env
+.env.*
+!.env.example
+.envrc
+.streamlit/secrets.toml
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local databases and sidecar files
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Local editor and assistant state
+.vscode/
+.idea/
+.codex/
+.claude/
+.gemini/
+.cursor/
+.windsurf/
+.antigravity/
+.copilot/
+
+# Operating system and temporary files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+*.swp
+*.swo
+*.tmp
+*.bak
+*~

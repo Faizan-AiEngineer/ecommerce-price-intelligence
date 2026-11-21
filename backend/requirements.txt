@@ -1,0 +1,16 @@
+fastapi==0.117.0
+uvicorn[standard]==0.35.0
+sqlalchemy==2.0.41
+alembic==1.16.1
+pydantic==2.11.7
+pydantic-settings>=2.0.0
+pandas==2.2.3
+httpx==0.28.1
+apscheduler==3.11.0
+openpyxl==3.1.5
+python-dotenv==1.1.1
+pytest==8.4.2
+pytest-asyncio==1.0.0
+playwright==1.55.0
+ruff==0.12.10
+psycopg2-binary>=2.9.9
